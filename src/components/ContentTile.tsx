@@ -29,79 +29,83 @@ type Props = Omit<
   setExternalRef?: any;
 };
 
-export const ContentTile: FC<Props> = ({
-  image,
-  style,
-  focusedScale,
-  onFocus,
-  onBlur,
-  layoutStyle,
-  setExternalRef,
-  ...tileProps
-}) => {
-  const ref = useRef();
-  const [raiseContentTileAnimationValue] = useState(
-    () => new Animated.Value(1),
-  );
-  const [isFocused, setIsFocused] = useState(false);
-
-  const onFocusedTile = useCallback(
-    (e: NativeSyntheticEvent<TargetedEvent>) => {
-      setIsFocused(true);
-      onFocus?.(e);
+export const ContentTile: FC<Props> = React.forwardRef(
+  (
+    {
+      image,
+      style,
+      focusedScale,
+      onFocus,
+      onBlur,
+      layoutStyle,
+      setExternalRef,
+      ...tileProps
     },
-    [setIsFocused, onFocus],
-  );
+    ref,
+  ) => {
+    const [raiseContentTileAnimationValue] = useState(
+      () => new Animated.Value(1),
+    );
+    const [isFocused, setIsFocused] = useState(false);
 
-  const onBlurredTile = useCallback(
-    (e: NativeSyntheticEvent<TargetedEvent>) => {
-      setIsFocused(false);
-      onBlur?.(e);
-    },
-    [setIsFocused, onBlur],
-  );
-  useEffect(() => {
-    const animationDuration = 200;
-    Animated.timing(raiseContentTileAnimationValue, {
-      toValue: isFocused ? focusedScale : 1,
-      useNativeDriver: true,
-      duration: animationDuration,
-    }).start();
-  }, [focusedScale, isFocused, raiseContentTileAnimationValue]);
+    const onFocusedTile = useCallback(
+      (e: NativeSyntheticEvent<TargetedEvent>) => {
+        setIsFocused(true);
+        onFocus?.(e);
+      },
+      [setIsFocused, onFocus],
+    );
 
-  const mountedComponentRef = useRef(false);
-  useLayoutEffect(() => {
-    if (!mountedComponentRef?.current && setExternalRef) {
-      setExternalRef?.(ref);
-    }
-    mountedComponentRef.current = true;
-  }, [ref, setExternalRef]);
+    const onBlurredTile = useCallback(
+      (e: NativeSyntheticEvent<TargetedEvent>) => {
+        setIsFocused(false);
+        onBlur?.(e);
+      },
+      [setIsFocused, onBlur],
+    );
+    useEffect(() => {
+      const animationDuration = 200;
+      Animated.timing(raiseContentTileAnimationValue, {
+        toValue: isFocused ? focusedScale : 1,
+        useNativeDriver: true,
+        duration: animationDuration,
+      }).start();
+    }, [focusedScale, isFocused, raiseContentTileAnimationValue]);
 
-  return (
-    <View style={layoutStyle}>
-      <Tile
-        activeOpacity={1}
-        {...tileProps}
-        imageSource={image}
-        onFocus={onFocusedTile}
-        onBlur={onBlurredTile}
-        style={[
-          style,
-          isFocused ? styles.focused : undefined,
-          {
-            transform: [
-              {
-                scale: raiseContentTileAnimationValue,
-              },
-            ],
-          },
-        ]}
-        contentContainerStyle={styles.logoContainer}
-        accessibilityLabel="Show tile"
-        ref={ref}></Tile>
-    </View>
-  );
-};
+    const mountedComponentRef = useRef(false);
+    useLayoutEffect(() => {
+      if (!mountedComponentRef?.current && setExternalRef) {
+        setExternalRef?.(ref);
+      }
+      mountedComponentRef.current = true;
+    }, [ref, setExternalRef]);
+
+    return (
+      <View style={layoutStyle}>
+        <Tile
+          activeOpacity={1}
+          {...tileProps}
+          imageSource={image}
+          onFocus={onFocusedTile}
+          onBlur={onBlurredTile}
+          style={[
+            style,
+            isFocused ? styles.focused : undefined,
+            {
+              transform: [
+                {
+                  scale: raiseContentTileAnimationValue,
+                },
+              ],
+            },
+          ]}
+          contentContainerStyle={styles.logoContainer}
+          accessibilityLabel="Show tile"
+          ref={ref}></Tile>
+      </View>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   logoContainer: {

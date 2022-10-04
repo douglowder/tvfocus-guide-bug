@@ -7,9 +7,11 @@ type Props = {
   text: string;
 };
 
-export const HeaderButton: FC<Props> = ({text}) => {
+export const HeaderButton: FC<Props> = ({text, hasTVPreferredFocus}) => {
   return (
-    <TouchableOpacity>
+    <TouchableOpacity
+      hasTVPreferredFocus={hasTVPreferredFocus}
+      onPress={() => {}}>
       <Text style={styles.text}>{text}</Text>
     </TouchableOpacity>
   );

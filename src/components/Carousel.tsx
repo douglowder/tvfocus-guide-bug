@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useRef, useState} from 'react';
+import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
 import {
   Dimensions,
   StyleSheet,
@@ -45,6 +45,8 @@ export const Carousel: FC<Props> = ({
   const tileWidth = tileStyle.width;
   const tiles = useRef<(TouchableOpacity | null)[]>([]);
 
+  const [destinations, setDestinations] = useState([]);
+
   // space between tiles based on how much the tiles are scaled
   const tileMargin = scaleSize(30 + 6 * (2 - focusScaleFactor));
   const gradientWidth = scaleSize(64);
@@ -66,16 +68,16 @@ export const Carousel: FC<Props> = ({
     setSelectedTile(index);
   };
 
-  const firstTileRef = useRef(null);
+  const firstTileRef = useRef();
+  const otherTileRefs = useRef();
 
-  const setFirstItemRef = useCallback(ref => {
-    firstTileRef.current = ref.current;
-  }, []);
+  useEffect(() => {
+    setDestinations(firstTileRef?.current ? [firstTileRef?.current] : []);
+  }, [firstTileRef?.current]);
 
   if (contentTiles.length === 0) return <></>;
 
-  const destinations = firstTileRef?.current ? [firstTileRef?.current] : [];
-
+  console.log(`destinations length = ${destinations.length}`);
   return (
     <View style={layoutStyle}>
       <SectionTitle style={styles.title}>{carouseTitle}</SectionTitle>
@@ -97,6 +99,7 @@ export const Carousel: FC<Props> = ({
           renderItem={({item, index}) => {
             return (
               <ContentTile
+                ref={index === 0 ? firstTileRef : otherTileRefs}
                 image={item}
                 style={[
                   tileStyle,
@@ -110,7 +113,6 @@ export const Carousel: FC<Props> = ({
                 layoutStyle={{
                   marginRight: tileMargin,
                 }}
-                setExternalRef={index === 0 ? setFirstItemRef : undefined}
               />
             );
           }}

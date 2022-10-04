@@ -5,7 +5,7 @@ import {HeaderButton} from './HeaderButton';
 
 export const Header = () => (
   <View style={styles.container}>
-    <HeaderButton text="Home" />
+    <HeaderButton hasTVPreferredFocus text="Home" />
     <HeaderButton text="Discover" />
     <HeaderButton text="My profile" />
   </View>
